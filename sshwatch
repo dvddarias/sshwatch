@@ -1,0 +1,50 @@
+#!/bin/bash
+ext="config"
+backup_file="$HOME/.ssh/default.${ext}"
+base_file="$HOME/.ssh/config"
+interval=2
+
+#if no config file then create it
+if [[ ! -f "$base_file"  ]]; then
+    touch "$base_file"
+fi
+
+#if no backup of the config file then create it
+if [[ ! -f "$backup_file" ]]; then
+    echo "Creating backup file from /.ssh/config."
+    cp "$base_file" "$backup_file"
+fi
+
+#every interval seconds check files
+while sleep $interval; do
+    nmcli -t -f NAME con status |
+    {
+        while read con; do
+            new_file="$HOME/.ssh/${con}.${ext}"
+            #if configuration file exists it is different from the current
+            if [[ -f "$new_file" ]]; then
+                exists_config=true
+                echo "$new_file exists."
+                if [[ `md5sum "$new_file" | cut -c -32` != `md5sum "$base_file" | cut -c -32` ]]; then
+                    #change configuration
+                    cp ${new_file} ${new_file}.aux
+                    mv -f ${new_file}.aux ${base_file}
+                    notify-send -u low "Changed ssh configuration to match $con profile."
+                    echo "Changed config to" $con
+                else
+                    echo "it was the same as $base_file"
+                fi
+            else
+                echo "$new_file does not exist."
+            fi
+        done
+        #if no named config found then use default configuration (backup_file)
+        if [[ "${exists_config:-false}" != true && `md5sum "$backup_file" | cut -c -32` != `md5sum "$base_file" | cut -c -32` ]]; then
+            cp ${backup_file} ${backup_file}.aux
+            mv -f ${backup_file}.aux ${base_file}
+            echo "Changed config to default."
+            notify-send -u low "Changed ssh configuration to default profile."
+        fi
+        exists_config=false
+    }
+done
