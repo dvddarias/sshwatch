@@ -21,10 +21,11 @@ while sleep $interval; do
     {
         while read con; do
             new_file="$HOME/.ssh/${con}.${ext}"
-            #if configuration file exists it is different from the current
+            #if configuration file exists
             if [[ -f "$new_file" ]]; then
                 exists_config=true
                 # echo "$new_file exists."
+                # if it is different from the current
                 if [[ `md5sum "$new_file" | cut -c -32` != `md5sum "$base_file" | cut -c -32` ]]; then
                     #change configuration
                     cp ${new_file} ${new_file}.aux
