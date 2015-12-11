@@ -24,7 +24,7 @@ while sleep $interval; do
             #if configuration file exists it is different from the current
             if [[ -f "$new_file" ]]; then
                 exists_config=true
-                echo "$new_file exists."
+                # echo "$new_file exists."
                 if [[ `md5sum "$new_file" | cut -c -32` != `md5sum "$base_file" | cut -c -32` ]]; then
                     #change configuration
                     cp ${new_file} ${new_file}.aux
@@ -32,10 +32,10 @@ while sleep $interval; do
                     notify-send -u low "Changed ssh configuration to match $con profile."
                     echo "Changed config to" $con
                 else
-                    echo "it was the same as $base_file"
+                    : # echo "but it was the same as $base_file"
                 fi
             else
-                echo "$new_file does not exist."
+                : # echo "$new_file does not exist."
             fi
         done
         #if no named config found then use default configuration (backup_file)
