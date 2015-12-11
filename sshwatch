@@ -1,6 +1,6 @@
 #!/bin/bash
 ext="config"
-backup_file="$HOME/.ssh/default.${ext}"
+backup_file="$HOME/.ssh/${ext}.default"
 base_file="$HOME/.ssh/config"
 interval=2
 
@@ -20,7 +20,7 @@ while sleep $interval; do
     nmcli -t -f NAME con status |
     {
         while read con; do
-            new_file="$HOME/.ssh/${con}.${ext}"
+            new_file="$HOME/.ssh/${ext}.${con}"
             #if configuration file exists
             if [[ -f "$new_file" ]]; then
                 exists_config=true
