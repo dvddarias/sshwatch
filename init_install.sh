@@ -14,6 +14,7 @@ if [[ $# -eq 1 && "$1" = "-u" ]]; then
 	sudo service "$name" stop
 	sudo rm "/etc/init.d/$name"
 	sudo rm "$run_path"
+	sudo update-rc.d sshwatch remove
 	exit
 fi
 
@@ -139,3 +140,4 @@ sudo chmod +x "$run_path"
 sudo mv "/tmp/$name" "/etc/init.d/$name"
 sudo chmod +x "/etc/init.d/$name"
 sudo service "$name" start
+sudo update-rc.d sshwatch defaults
