@@ -28,8 +28,8 @@ while sleep $interval; do
                 # if it is different from the current
                 if [[ `md5sum "$new_file" | cut -c -32` != `md5sum "$base_file" | cut -c -32` ]]; then
                     #change configuration
-                    cp ${new_file} ${new_file}.aux
-                    mv -f ${new_file}.aux ${base_file}
+                    cp "${new_file}" "${new_file}.aux"
+                    mv -f "${new_file}.aux" "${base_file}"
                     notify-send -u low "Changed ssh configuration to match $con profile."
                     echo "Changed config to" $con
                 else
@@ -41,8 +41,8 @@ while sleep $interval; do
         done
         #if no named config found then use default configuration (backup_file)
         if [[ "${exists_config:-false}" != true && `md5sum "$backup_file" | cut -c -32` != `md5sum "$base_file" | cut -c -32` ]]; then
-            cp ${backup_file} ${backup_file}.aux
-            mv -f ${backup_file}.aux ${base_file}
+            cp "${backup_file}" "${backup_file}.aux"
+            mv -f "${backup_file}.aux" "${base_file}"
             echo "Changed config to default."
             notify-send -u low "Changed ssh configuration to default profile."
         fi
