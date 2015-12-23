@@ -1,4 +1,5 @@
 #!/bin/bash
+#---------------------------------EDIT HERE-----------------------------------------
 name="sshwatch"
 shot_desc="SSH config swapper."
 desc="A daemon to swap the ~/.ssh/config file in correspondence with the network profile."
@@ -6,15 +7,21 @@ desc="A daemon to swap the ~/.ssh/config file in correspondence with the network
 user="$(whoami)" #the user name that will run the script
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" #get the bash script directory
 script_path="$dir/$name"
-run_path="/usr/local/bin/$name"
+#Uncomment this line to set the path of a configuration file
+#script_config="$dir/config.json"
+
 daemon_pwd="/usr/local/bin"
-opts="none"
+daemon_path="/usr/local/bin/$name"
+daemon_config="/etc/$name"
+daemon_opts="none"
+#-----------------END OF EDIT UNLESS YOU KNOW WHAT YOU ARE DOING--------------------
 
 if [[ $# -eq 1 && "$1" = "-u" ]]; then
 	sudo service "$name" stop
+	sudo rm "$daemon_path"
+	sudo rm -rf "$daemon_config"
 	sudo rm "/etc/init.d/$name"
-	sudo rm "$run_path"
-	sudo update-rc.d sshwatch remove
+	sudo update-rc.d "$name" remove
 	exit
 fi
 
@@ -38,8 +45,8 @@ service="#!/bin/sh
 
 DAEMON_NAME=\"$name\"
 DAEMON_USER=\"$user\"
-DAEMON_PATH=\"$run_path\"
-DAEMON_OPTS=\"$opts\"
+DAEMON_PATH=\"$daemon_path\"
+DAEMON_OPTS=\"$daemon_opts\"
 DAEMON_PWD=\"$daemon_pwd\"
 
 DAEMON_PID=\"/var/run/\${DAEMON_NAME}.pid\"
@@ -133,11 +140,18 @@ esac
 
 printf "$service" > "/tmp/$name"
 #copy the executable to local/bin
-sudo cp "$script_path" "$run_path"
-sudo chmod +x "$run_path"
+sudo cp "$script_path" "$daemon_path"
+sudo chmod +x "$daemon_path"
+
+#copy the configuration if it is declared
+sudo mkdir -p "$daemon_config"
+if [[ -n "${script_config}" ]]; then
+	sudo cp "$script_config" "$daemon_config/${name}.config"
+fi
 
 #install the init script
 sudo mv "/tmp/$name" "/etc/init.d/$name"
 sudo chmod +x "/etc/init.d/$name"
 sudo service "$name" start
-sudo update-rc.d sshwatch defaults
+sudo update-rc.d "$name" defaults
+
