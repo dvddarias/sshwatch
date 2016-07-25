@@ -17,7 +17,7 @@ fi
 
 #every interval seconds check files
 while sleep $interval; do
-    nmcli -t -f NAME con status |
+    nmcli -t -f NAME con show |
     {
         while read con; do
             new_file="$HOME/.ssh/${ext}.${con}"
